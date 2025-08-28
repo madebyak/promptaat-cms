@@ -58,7 +58,7 @@ export function ConfirmDialog({
   const styles = getVariantStyles();
 
   return (
-    <Dialog isOpen={isOpen} onClose={onClose} maxWidth="max-w-[400pxn]">
+    <Dialog isOpen={isOpen} onClose={onClose} maxWidth="max-w-md">
       <DialogContent className="p-3">
         <div className="flex items-start gap-2">
           <div className={`flex-shrink-0 w-8 h-8 rounded-full ${styles.iconBg} flex items-center justify-center`}>

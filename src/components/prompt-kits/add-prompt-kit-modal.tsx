@@ -524,24 +524,7 @@ export function AddPromptKitModal({ isOpen, onClose, onSuccess, categories, tool
               )}
             </div>
 
-            {/* Instructions */}
-            <div className="space-y-3">
-              <label htmlFor="instructions" className="block text-sm font-medium text-foreground mb-1.5">
-                Instructions <span className="text-destructive">*</span>
-              </label>
-              <Textarea
-                id="instructions"
-                value={formData.instructions}
-                onChange={(e) => handleInputChange('instructions', e.target.value)}
-                placeholder="Enter instructions on how to use this kit..."
-                error={errors.instructions}
-                disabled={isSubmitting}
-                rows={3}
-              />
-              {errors.instructions && (
-                <p className="text-sm text-destructive">{errors.instructions}</p>
-              )}
-            </div>
+
 
             {/* Article Content */}
             <div className="space-y-3">

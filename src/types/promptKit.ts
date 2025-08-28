@@ -2,7 +2,6 @@ export interface PromptKit {
   id: string;
   name: string;
   description: string;
-  instructions: string;
   article: string;
   image_url: string;
   tags: string[];

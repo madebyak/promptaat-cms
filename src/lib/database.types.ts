@@ -252,7 +252,6 @@ export interface Database {
           id: string
           name: string
           description: string | null
-          instructions: string | null
           article: string | null
           image_url: string | null
           keywords: string[] | null
@@ -269,7 +268,6 @@ export interface Database {
           id?: string
           name: string
           description?: string | null
-          instructions?: string | null
           article?: string | null
           image_url?: string | null
           keywords?: string[] | null
@@ -286,7 +284,6 @@ export interface Database {
           id?: string
           name?: string
           description?: string | null
-          instructions?: string | null
           article?: string | null
           image_url?: string | null
           keywords?: string[] | null
