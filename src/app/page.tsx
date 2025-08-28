@@ -1,103 +1,148 @@
-import Image from "next/image";
+'use client'
 
-export default function Home() {
+import { useState, useEffect } from 'react';
+import { StatsCards } from '@/components/dashboard/stats-cards';
+import { RecentActivityComponent } from '@/components/dashboard/recent-activity';
+import { QuickActions } from '@/components/dashboard/quick-actions';
+import { OverviewChart } from '@/components/dashboard/overview-chart';
+import { TestConnection } from '@/components/test-connection';
+import { ProtectedRoute } from '@/components/auth/protected-route';
+import { 
+  getQuickStats, 
+  getRecentActivity, 
+  getDashboardStats,
+  QuickStat,
+  RecentActivity,
+  DashboardStats,
+  formatBytes
+} from '@/lib/data/dashboard';
+
+export default function Dashboard() {
+  const [quickStats, setQuickStats] = useState<QuickStat[]>([]);
+  const [recentActivity, setRecentActivity] = useState<RecentActivity[]>([]);
+  const [dashboardStats, setDashboardStats] = useState<DashboardStats | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const loadDashboardData = async () => {
+      try {
+        const [stats, activity, overview] = await Promise.all([
+          getQuickStats(),
+          getRecentActivity(),
+          getDashboardStats()
+        ]);
+        
+        setQuickStats(stats);
+        setRecentActivity(activity);
+        setDashboardStats(overview);
+      } catch (error) {
+        console.error('Failed to load dashboard data:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadDashboardData();
+  }, []);
+
   return (
-    <div className="font-sans grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20">
-      <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="font-mono list-inside list-decimal text-sm/6 text-center sm:text-left">
-          <li className="mb-2 tracking-[-.01em]">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] font-mono font-semibold px-1 py-0.5 rounded">
-              src/app/page.tsx
-            </code>
-            .
-          </li>
-          <li className="tracking-[-.01em]">
-            Save and see your changes instantly.
-          </li>
-        </ol>
+    <ProtectedRoute>
+      <div className="container mx-auto px-6 py-8">
+      {/* Header */}
+      <div className="mb-8">
+        <h1 className="text-3xl font-bold text-foreground mb-2">Dashboard</h1>
+        <p className="text-muted-foreground">
+          Welcome back! Here&apos;s what&apos;s happening with your CMS.
+        </p>
+      </div>
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 w-full sm:w-auto md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
+      {/* Supabase Connection Test */}
+      <div className="mb-8">
+        <TestConnection />
+      </div>
+
+      {/* Quick Stats Cards */}
+      <StatsCards stats={quickStats} loading={loading} />
+
+      {/* Main Content Grid */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
+        {/* Chart - Takes 2 columns on large screens */}
+        <div className="lg:col-span-2">
+          <OverviewChart />
         </div>
-      </main>
-      <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
-    </div>
+
+        {/* Quick Actions - Takes 1 column */}
+        <div>
+          <QuickActions />
+        </div>
+      </div>
+
+      {/* Bottom Section */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        {/* Recent Activity */}
+        <RecentActivityComponent activities={recentActivity} loading={loading} />
+
+        {/* System Overview */}
+        <div className="bg-background border border-border rounded-lg p-6">
+          <h2 className="text-xl font-semibold text-foreground mb-4">System Overview</h2>
+          
+          {loading || !dashboardStats ? (
+            <div className="space-y-4">
+              {Array.from({ length: 4 }).map((_, index) => (
+                <div key={index} className="animate-pulse">
+                  <div className="h-4 bg-muted rounded w-3/4 mb-2"></div>
+                  <div className="h-6 bg-muted rounded w-1/2"></div>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="space-y-4">
+              <div className="flex justify-between items-center">
+                <span className="text-sm text-muted-foreground">Total Content</span>
+                <span className="text-lg font-semibold text-foreground">
+                  {dashboardStats.totalPosts + dashboardStats.totalMedia + dashboardStats.totalCategories}
+                </span>
+              </div>
+              
+              <div className="flex justify-between items-center">
+                <span className="text-sm text-muted-foreground">Published Posts</span>
+                <span className="text-lg font-semibold text-green-600">
+                  {dashboardStats.publishedPosts}
+                </span>
+              </div>
+              
+              <div className="flex justify-between items-center">
+                <span className="text-sm text-muted-foreground">Draft Posts</span>
+                <span className="text-lg font-semibold text-orange-600">
+                  {dashboardStats.draftPosts}
+                </span>
+              </div>
+              
+              <div className="flex justify-between items-center">
+                <span className="text-sm text-muted-foreground">Storage Used</span>
+                <span className="text-lg font-semibold text-blue-600">
+                  {formatBytes(dashboardStats.mediaStorage)}
+                </span>
+              </div>
+              
+              <div className="flex justify-between items-center">
+                <span className="text-sm text-muted-foreground">Active Users (7d)</span>
+                <span className="text-lg font-semibold text-purple-600">
+                  {dashboardStats.recentUsers}
+                </span>
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* Footer Info */}
+      <div className="mt-8 text-center">
+        <p className="text-xs text-muted-foreground">
+          CMS Dashboard v1.0
+        </p>
+      </div>
+      </div>
+    </ProtectedRoute>
   );
 }

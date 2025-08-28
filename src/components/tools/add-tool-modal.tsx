@@ -1,0 +1,363 @@
+'use client'
+
+import React, { useState, useRef } from 'react';
+import { Tool } from '@/types/tool';
+import { createTool } from '@/lib/data/tools';
+import { uploadMedia } from '@/lib/data/media';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter, DialogCloseButton } from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
+import { ImagePlus, X } from 'lucide-react';
+
+interface AddToolModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+  onSuccess: (tool: Tool) => void;
+  tools: Tool[];
+}
+
+interface FormData {
+  name: string;
+  image_url: string;
+  website_link: string;
+  sort_order: number;
+}
+
+interface FormErrors {
+  name?: string;
+  image_url?: string;
+  website_link?: string;
+  sort_order?: string;
+}
+
+export function AddToolModal({ isOpen, onClose, onSuccess, tools }: AddToolModalProps) {
+  const [formData, setFormData] = useState<FormData>({
+    name: '',
+    image_url: '',
+    website_link: '',
+    sort_order: 1
+  });
+
+  const [errors, setErrors] = useState<FormErrors>({});
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const [selectedImageFile, setSelectedImageFile] = useState<File | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // Calculate next sort order
+  React.useEffect(() => {
+    if (isOpen) {
+      const maxSortOrder = tools.length > 0
+        ? Math.max(...tools.map(tool => tool.sort_order))
+        : 0;
+      setFormData(prev => ({
+        ...prev,
+        sort_order: maxSortOrder + 1
+      }));
+    }
+  }, [isOpen, tools]);
+
+  // Reset form when modal opens/closes
+  React.useEffect(() => {
+    if (isOpen) {
+      // Calculate initial sort order
+      const maxSortOrder = tools.length > 0
+        ? Math.max(...tools.map(tool => tool.sort_order))
+        : 0;
+      
+      setFormData({
+        name: '',
+        image_url: '',
+        website_link: '',
+        sort_order: maxSortOrder + 1
+      });
+      setErrors({});
+      setIsSubmitting(false);
+      setImagePreview(null);
+      setSelectedImageFile(null);
+    }
+  }, [isOpen, tools]);
+
+  const validateForm = (): boolean => {
+    const newErrors: FormErrors = {};
+
+    // Name validation
+    if (!formData.name.trim()) {
+      newErrors.name = 'Tool name is required';
+    } else if (formData.name.trim().length < 2) {
+      newErrors.name = 'Tool name must be at least 2 characters';
+    } else if (formData.name.trim().length > 100) {
+      newErrors.name = 'Tool name must be less than 100 characters';
+    }
+
+    // Website link validation
+    if (formData.website_link && !isValidUrl(formData.website_link)) {
+      newErrors.website_link = 'Please enter a valid URL';
+    }
+
+    // Sort order validation
+    if (formData.sort_order < 1) {
+      newErrors.sort_order = 'Sort order must be at least 1';
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
+  const isValidUrl = (url: string) => {
+    try {
+      new URL(url);
+      return true;
+    } catch {
+      return false;
+    }
+  };
+
+  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      if (file.size > 5 * 1024 * 1024) { // 5MB limit
+        setErrors(prev => ({
+          ...prev,
+          image_url: 'Image size should be less than 5MB'
+        }));
+        return;
+      }
+
+      // Store the file for later upload and create preview
+      setSelectedImageFile(file);
+      
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        const result = reader.result as string;
+        setImagePreview(result);
+        // Clear any previous errors
+        setErrors(prev => ({ ...prev, image_url: undefined }));
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const handleRemoveImage = () => {
+    setImagePreview(null);
+    setSelectedImageFile(null);
+    setFormData(prev => ({ ...prev, image_url: '' }));
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (!validateForm()) {
+      return;
+    }
+
+    setIsSubmitting(true);
+
+    try {
+      let imageUrl = formData.image_url;
+      
+      // Upload image if one was selected
+      if (selectedImageFile) {
+        console.log('🚀 Tool: Uploading image on save...');
+        const uploadedMedia = await uploadMedia(selectedImageFile, {
+          alt: `Tool image for ${formData.name.trim()}`
+        }, 'tool-images');
+        
+        imageUrl = uploadedMedia.url;
+        console.log('✅ Tool: Image uploaded successfully:', imageUrl);
+      }
+
+      // Create tool in database
+      const newTool = await createTool({
+        name: formData.name.trim(),
+        image_url: imageUrl || undefined,
+        website_link: formData.website_link.trim() || undefined,
+        sort_order: formData.sort_order
+      });
+
+      onSuccess(newTool);
+      onClose();
+    } catch (error) {
+      console.error('Failed to create tool:', error);
+      // Handle error (could show toast notification)
+      alert('Failed to create tool. Please try again.');
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleInputChange = (field: keyof FormData, value: string | number) => {
+    setFormData(prev => ({ ...prev, [field]: value }));
+    
+    // Clear error when user starts typing
+    if (errors[field]) {
+      setErrors(prev => ({ ...prev, [field]: undefined }));
+    }
+  };
+
+  return (
+    <Dialog isOpen={isOpen} onClose={onClose}>
+      <DialogContent>
+        <DialogHeader>
+          <div className="flex items-center justify-between w-full">
+            <div>
+              <DialogTitle>Add New Tool</DialogTitle>
+              <DialogDescription>
+                Add a new tool to your collection. Tools will be displayed based on their sort order.
+              </DialogDescription>
+            </div>
+            <DialogCloseButton onClose={onClose} />
+          </div>
+        </DialogHeader>
+
+        <form onSubmit={handleSubmit} className="space-y-0">
+          <div className="px-6 py-4 space-y-8 max-h-[60vh] overflow-y-auto scroll-smooth
+                          scrollbar-thin scrollbar-track-muted scrollbar-thumb-muted-foreground">
+            {/* Tool Name */}
+            <div className="space-y-3">
+              <label htmlFor="toolName" className="block text-sm font-medium text-foreground mb-1.5">
+                Tool Name <span className="text-destructive">*</span>
+              </label>
+              <Input
+                id="toolName"
+                type="text"
+                value={formData.name}
+                onChange={(e) => handleInputChange('name', e.target.value)}
+                placeholder="Enter tool name..."
+                error={!!errors.name}
+                disabled={isSubmitting}
+              />
+              {errors.name && (
+                <p className="text-sm text-destructive">{errors.name}</p>
+              )}
+            </div>
+
+            {/* Image Upload */}
+            <div className="space-y-3">
+              <label className="block text-sm font-medium text-foreground mb-1.5">
+                Tool Image
+              </label>
+              <div className="flex flex-col items-center justify-center w-full">
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept="image/*"
+                  onChange={handleImageUpload}
+                  className="hidden"
+                  disabled={isSubmitting}
+                />
+                
+                {imagePreview ? (
+                  <div className="relative w-full max-w-2xl h-[300px] mb-4 mx-auto">
+                    <img
+                      src={imagePreview}
+                      alt="Tool preview"
+                      className="w-full h-full object-contain rounded-lg border-2 border-dashed border-border bg-muted/30"
+                    />
+                    <button
+                      type="button"
+                      onClick={handleRemoveImage}
+                      className="absolute top-3 right-3 p-2 rounded-full bg-background/90 hover:bg-background border border-border shadow-sm transition-colors"
+                    >
+                      <X className="h-5 w-5" />
+                    </button>
+                  </div>
+                ) : (
+                  <Button
+                    type="button"
+                    variant="outline"
+                    className="w-full max-w-2xl h-[300px] mx-auto flex flex-col items-center justify-center gap-4 
+                             border-2 border-dashed rounded-lg hover:bg-muted/30 transition-colors"
+                    onClick={() => fileInputRef.current?.click()}
+                    disabled={isSubmitting}
+                  >
+                    <div className="p-4 rounded-full bg-muted/50">
+                      <ImagePlus className="h-10 w-10 text-muted-foreground" />
+                    </div>
+                    <div className="space-y-2 text-center">
+                      <p className="text-base font-medium text-foreground">
+                        Click to upload image
+                      </p>
+                      <p className="text-sm text-muted-foreground">
+                        SVG, PNG, JPG (max. 5MB)
+                      </p>
+                    </div>
+                  </Button>
+                )}
+                {errors.image_url && (
+                  <p className="text-sm text-destructive mt-2">{errors.image_url}</p>
+                )}
+              </div>
+            </div>
+
+            {/* Website Link */}
+            <div className="space-y-3">
+              <label htmlFor="websiteLink" className="block text-sm font-medium text-foreground mb-1.5">
+                Website Link
+              </label>
+              <Input
+                id="websiteLink"
+                type="url"
+                value={formData.website_link}
+                onChange={(e) => handleInputChange('website_link', e.target.value)}
+                placeholder="Enter website URL..."
+                error={!!errors.website_link}
+                disabled={isSubmitting}
+              />
+              {errors.website_link && (
+                <p className="text-sm text-destructive">{errors.website_link}</p>
+              )}
+            </div>
+
+            {/* Sort Order */}
+            <div className="space-y-3">
+              <label htmlFor="sortOrder" className="block text-sm font-medium text-foreground mb-1.5">
+                Sort Order
+              </label>
+              <Input
+                id="sortOrder"
+                type="number"
+                min={1}
+                value={formData.sort_order}
+                onChange={(e) => handleInputChange('sort_order', parseInt(e.target.value) || 1)}
+                error={!!errors.sort_order}
+                disabled={isSubmitting}
+              />
+              <p className="text-xs text-muted-foreground">
+                Determines the display order. Lower numbers appear first.
+              </p>
+              {errors.sort_order && (
+                <p className="text-sm text-destructive">{errors.sort_order}</p>
+              )}
+            </div>
+          </div>
+
+          <DialogFooter>
+            <div className="flex flex-col-reverse sm:flex-row gap-3 w-full sm:w-auto">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={onClose}
+                disabled={isSubmitting}
+                className="w-full sm:w-auto"
+              >
+                Cancel
+              </Button>
+              <Button
+                type="submit"
+                disabled={isSubmitting}
+                className="text-white w-full sm:w-auto"
+                style={{backgroundColor: '#A2AADB'}}
+              >
+                {isSubmitting ? 'Creating...' : 'Create Tool'}
+              </Button>
+            </div>
+          </DialogFooter>
+        </form>
+      </DialogContent>
+    </Dialog>
+  );
+}
