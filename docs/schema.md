@@ -83,7 +83,6 @@ CREATE TABLE prompt_kits (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     name VARCHAR(255) NOT NULL,
     description TEXT,
-    instructions TEXT, -- How to use the prompts
     article TEXT, -- Detailed article/tutorial content
     image_url TEXT, -- Kit thumbnail/cover image
     keywords TEXT[], -- Array of keywords for search
@@ -112,10 +111,18 @@ CREATE TABLE kit_categories (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     kit_id UUID REFERENCES prompt_kits(id) ON DELETE CASCADE,
     category_id UUID REFERENCES categories(id) ON DELETE CASCADE,
-    subcategory_id UUID REFERENCES subcategories(id) ON DELETE CASCADE,
-    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
-    UNIQUE(kit_id, category_id, subcategory_id)
+    subcategory_id UUID REFERENCES subcategories(id) ON DELETE CASCADE, -- Made nullable to allow category-only associations
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
+
+-- Create unique constraints that handle NULLs properly
+CREATE UNIQUE INDEX kit_categories_unique_with_nulls 
+ON kit_categories (kit_id, category_id) 
+WHERE subcategory_id IS NULL;
+
+CREATE UNIQUE INDEX kit_categories_unique_with_subcategory 
+ON kit_categories (kit_id, category_id, subcategory_id) 
+WHERE subcategory_id IS NOT NULL;
 
 -- Prompt tools junction table
 CREATE TABLE prompt_tools (

@@ -12,7 +12,7 @@ export const promptKitTableColumns = [
   // image_url is not included here as it will be displayed with name and not configurable
   { id: 'name', label: 'Name', canHide: false },
   { id: 'description', label: 'Description', canHide: true },
-  { id: 'instructions', label: 'Instructions', canHide: true },
+
   { id: 'tags', label: 'Keywords', canHide: true },
   { id: 'tier', label: 'Tier', canHide: true },
   { id: 'visibility', label: 'Visibility', canHide: true },
@@ -303,13 +303,7 @@ export function PromptKitsTable({
                 </TableCell>
               )}
 
-              {visibleColumns.includes('instructions') && (
-                <TableCell>
-                  <div className="text-sm text-muted-foreground">
-                    <TruncateText text={kit.instructions} maxLength={60} />
-                  </div>
-                </TableCell>
-              )}
+
               
               {visibleColumns.includes('tags') && (
                 <TableCell>

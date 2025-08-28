@@ -27,7 +27,6 @@ interface AddPromptKitModalProps {
 interface FormData {
   name: string;
   description: string;
-  instructions: string;
   article: string;
   image_url: string;
   tags: string[];
@@ -41,7 +40,6 @@ interface FormData {
 interface FormErrors {
   name?: string;
   description?: string;
-  instructions?: string;
   article?: string;
   image_url?: string;
   tags?: string;
@@ -55,7 +53,6 @@ export function AddPromptKitModal({ isOpen, onClose, onSuccess, categories, tool
   const [formData, setFormData] = useState<FormData>({
     name: '',
     description: '',
-    instructions: '',
     article: '',
     image_url: '',
     tags: [],
@@ -82,7 +79,6 @@ export function AddPromptKitModal({ isOpen, onClose, onSuccess, categories, tool
       setFormData({
         name: '',
         description: '',
-        instructions: '',
         article: '',
         image_url: '',
         tags: [],
@@ -359,10 +355,7 @@ export function AddPromptKitModal({ isOpen, onClose, onSuccess, categories, tool
       newErrors.description = 'Description is required';
     }
 
-    // Instructions validation
-    if (!formData.instructions.trim()) {
-      newErrors.instructions = 'Instructions are required';
-    }
+
 
     // Article validation
     if (!formData.article.trim()) {
@@ -427,7 +420,6 @@ export function AddPromptKitModal({ isOpen, onClose, onSuccess, categories, tool
       const newPromptKit = {
         name: formData.name,
         description: formData.description,
-        instructions: formData.instructions,
         article: formData.article,
         image_url: imageUrl,
         tags: formData.tags,
@@ -523,8 +515,6 @@ export function AddPromptKitModal({ isOpen, onClose, onSuccess, categories, tool
                 <p className="text-sm text-destructive">{errors.description}</p>
               )}
             </div>
-
-
 
             {/* Article Content */}
             <div className="space-y-3">

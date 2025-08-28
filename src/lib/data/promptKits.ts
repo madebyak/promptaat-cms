@@ -29,6 +29,7 @@ const mockPromptKits: PromptKit[] = [
     id: '1',
     name: 'SEO Content Strategy Kit',
     description: 'A comprehensive set of prompts for planning, creating, and optimizing SEO content.',
+
     article: 'This kit contains 5 prompts that work together to help you build a complete SEO content strategy...',
     image_url: '/images/prompt-kits/seo-kit.png',
     tags: ['SEO', 'content marketing', 'blogging', 'keyword research'],
@@ -48,6 +49,7 @@ const mockPromptKits: PromptKit[] = [
     id: '2',
     name: 'Social Media Campaign Bundle',
     description: 'Everything you need to plan, create, and schedule a successful social media campaign.',
+
     article: 'This bundle includes campaign planning, content creation for 5 platforms, and analytics review prompts...',
     image_url: '/images/prompt-kits/social-media-bundle.png',
     tags: ['social media', 'marketing', 'campaign', 'content creation'],
@@ -67,6 +69,7 @@ const mockPromptKits: PromptKit[] = [
     id: '3',
     name: 'Academic Research Assistant Kit',
     description: 'A collection of prompts designed to help researchers at every stage of the academic process.',
+
     article: 'The Academic Research Assistant Kit provides specialized prompts for literature reviews, methodology planning...',
     image_url: '/images/prompt-kits/research-kit.png',
     tags: ['academic', 'research', 'literature review', 'thesis', 'dissertation'],
@@ -86,6 +89,7 @@ const mockPromptKits: PromptKit[] = [
     id: '4',
     name: 'E-Commerce Product Launch Kit',
     description: 'Launch new products successfully with this comprehensive set of prompts covering all aspects of product marketing.',
+
     article: 'The E-Commerce Product Launch Kit contains 8 specialized prompts that cover every touchpoint in a successful product launch...',
     image_url: '/images/prompt-kits/ecommerce-kit.png',
     tags: ['e-commerce', 'product launch', 'marketing', 'sales'],
@@ -105,6 +109,7 @@ const mockPromptKits: PromptKit[] = [
     id: '5',
     name: 'UX Design Process Kit',
     description: 'A complete set of prompts covering the entire UX design process from research to usability testing.',
+
     article: 'The UX Design Process Kit contains specialized prompts for user research, persona development, journey mapping...',
     image_url: '/images/prompt-kits/ux-kit.png',
     tags: ['UX design', 'user research', 'wireframing', 'usability', 'design thinking'],
@@ -124,6 +129,7 @@ const mockPromptKits: PromptKit[] = [
     id: '6',
     name: 'Fiction Writing Workshop',
     description: 'Develop compelling characters, plotlines, and worlds with this fiction writing prompt collection.',
+
     article: 'This workshop kit contains prompts designed to help fiction writers overcome common challenges and craft compelling stories...',
     image_url: '/images/prompt-kits/fiction-kit.png',
     tags: ['fiction', 'writing', 'creative', 'storytelling'],
@@ -143,6 +149,7 @@ const mockPromptKits: PromptKit[] = [
     id: '7',
     name: 'Data Analysis Starter Pack',
     description: 'Prompts for cleaning data, performing analysis, creating visualizations, and interpreting results.',
+
     article: 'The Data Analysis Starter Pack provides structured prompts for every stage of the data analysis process...',
     image_url: '/images/prompt-kits/data-analysis-kit.png',
     tags: ['data analysis', 'statistics', 'visualization', 'reporting'],
@@ -162,6 +169,7 @@ const mockPromptKits: PromptKit[] = [
     id: '8',
     name: 'Personal Branding Toolkit',
     description: 'Build and strengthen your personal brand with this collection of specialized prompts.',
+
     article: 'The Personal Branding Toolkit helps you define your unique value proposition, develop a consistent voice...',
     image_url: '/images/prompt-kits/personal-branding-kit.png',
     tags: ['personal branding', 'professional development', 'LinkedIn', 'content creation'],
@@ -181,6 +189,7 @@ const mockPromptKits: PromptKit[] = [
     id: '9',
     name: 'Web Development Project Templates',
     description: 'A collection of prompts to help structure and document every phase of a web development project.',
+
     article: 'These templates cover requirements gathering, architecture planning, coding standards, testing protocols...',
     image_url: '/images/prompt-kits/web-dev-kit.png',
     tags: ['web development', 'project management', 'documentation', 'coding'],
@@ -200,6 +209,7 @@ const mockPromptKits: PromptKit[] = [
     id: '10',
     name: 'Product Management Essentials',
     description: 'Essential prompts for product managers covering roadmap planning, user stories, and feature prioritization.',
+
     article: 'The Product Management Essentials kit provides specialized prompts for creating user stories, defining acceptance criteria...',
     image_url: '/images/prompt-kits/product-mgmt-kit.png',
     tags: ['product management', 'user stories', 'roadmap', 'agile'],
@@ -265,8 +275,8 @@ export async function getPromptKits(): Promise<PromptKit[]> {
           .map(kc => kc.categories.name) || [];
         
         const subcategories = kitCategories
-          ?.filter(kc => kc.subcategories)
-          .map(kc => kc.subcategories.name) || [];
+          ?.filter(kc => kc.subcategories && kc.subcategory_id !== null)
+          .map(kc => kc.subcategories!.name) || [];
 
         // Extract tool IDs
         const tool_ids = kitTools?.map(kt => kt.tool_id) || [];
@@ -333,8 +343,8 @@ export async function getPromptKitById(id: string): Promise<PromptKit | null> {
         .map(kc => kc.categories.name) || [];
       
       const subcategories = kitCategories
-        ?.filter(kc => kc.subcategories)
-        .map(kc => kc.subcategories.name) || [];
+        ?.filter(kc => kc.subcategories && kc.subcategory_id !== null)
+        .map(kc => kc.subcategories!.name) || [];
 
       // Extract tool IDs
       const tool_ids = kitTools?.map(kt => kt.tool_id) || [];
@@ -363,7 +373,6 @@ export async function createPromptKit(kitData: Omit<PromptKit, 'id' | 'createdAt
         .insert({
           name: kitInfo.name,
           description: kitInfo.description,
-
           article: kitInfo.article,
           image_url: kitInfo.image_url,
           keywords: kitInfo.tags, // Map tags to keywords in DB
@@ -434,7 +443,6 @@ export async function updatePromptKit(id: string, updates: Partial<Omit<PromptKi
       const dbUpdates: Record<string, unknown> = {};
       if (kitUpdates.name) dbUpdates.name = kitUpdates.name;
       if (kitUpdates.description) dbUpdates.description = kitUpdates.description;
-
       if (kitUpdates.article) dbUpdates.article = kitUpdates.article;
       if (kitUpdates.image_url) dbUpdates.image_url = kitUpdates.image_url;
       if (kitUpdates.tags) dbUpdates.keywords = kitUpdates.tags;
@@ -529,7 +537,6 @@ function mapKitToClientFormat(kit: Record<string, unknown>, categories: string[]
     id: kit.id as string,
     name: kit.name as string,
     description: (kit.description as string) || '',
-
     article: (kit.article as string) || '',
     image_url: (kit.image_url as string) || '',
     tags: (kit.keywords as string[]) || [],
@@ -550,44 +557,59 @@ function mapKitToClientFormat(kit: Record<string, unknown>, categories: string[]
 // Helper function to add kit categories
 async function addKitCategories(kitId: string, categories: string[], subcategories: string[]): Promise<void> {
   try {
-    // Get category IDs from names
-    const { data: categoryData, error: catError } = await supabase
-      .from('categories')
-      .select('id, name')
-      .in('name', categories);
+    const allInserts: Array<{ kit_id: string; category_id: string; subcategory_id: string | null }> = [];
 
-    if (catError) {
-      console.error('Error fetching category IDs:', catError);
-      return;
+    // Handle subcategories first (they automatically include their parent categories)
+    if (subcategories.length > 0) {
+      const { data: subcategoryData, error: subcatError } = await supabase
+        .from('subcategories')
+        .select('id, name, category_id')
+        .in('name', subcategories);
+
+      if (subcatError) {
+        console.error('Error fetching subcategory IDs:', subcatError);
+        throw subcatError;
+      }
+
+      // Create subcategory associations (each subcategory includes its parent category)
+      const subcategoryInserts = subcategoryData?.map(subcat => ({
+        kit_id: kitId,
+        category_id: subcat.category_id,
+        subcategory_id: subcat.id
+      })) || [];
+
+      allInserts.push(...subcategoryInserts);
     }
 
-    // Get subcategory IDs from names
-    const { data: subcategoryData, error: subcatError } = await supabase
-      .from('subcategories')
-      .select('id, name, category_id')
-      .in('name', subcategories);
+    // Handle category-only associations
+    if (categories.length > 0) {
+      // Get category IDs from names
+      const { data: categoryData, error: catError } = await supabase
+        .from('categories')
+        .select('id, name')
+        .in('name', categories);
 
-    if (subcatError) {
-      console.error('Error fetching subcategory IDs:', subcatError);
-      return;
+      if (catError) {
+        console.error('Error fetching category IDs:', catError);
+        throw catError;
+      }
+
+      // Get the category IDs that already have subcategory associations
+      const subcategoryCategoryIds = new Set(allInserts.map(insert => insert.category_id));
+      
+      // Add category-only associations (subcategory_id will be null)
+      for (const category of categoryData || []) {
+        if (!subcategoryCategoryIds.has(category.id)) {
+          allInserts.push({
+            kit_id: kitId,
+            category_id: category.id,
+            subcategory_id: null
+          });
+        }
+      }
     }
 
-    // Create category associations
-    const categoryInserts = categoryData?.map(cat => ({
-      kit_id: kitId,
-      category_id: cat.id,
-      subcategory_id: '' // Use empty string instead of null
-    })) || [];
-
-    // Create subcategory associations
-    const subcategoryInserts = subcategoryData?.map(subcat => ({
-      kit_id: kitId,
-      category_id: subcat.category_id,
-      subcategory_id: subcat.id
-    })) || [];
-
-    // Combine and insert all associations
-    const allInserts = [...categoryInserts, ...subcategoryInserts];
+    // Insert all associations
     if (allInserts.length > 0) {
       const { error: insertError } = await supabase
         .from('kit_categories')
@@ -595,9 +617,11 @@ async function addKitCategories(kitId: string, categories: string[], subcategori
 
       if (insertError) {
         console.error('Error inserting kit categories:', insertError);
+        throw insertError;
       }
     }
   } catch (error) {
     console.error('Failed to add kit categories:', error);
+    throw error;
   }
 }

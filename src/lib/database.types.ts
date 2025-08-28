@@ -349,21 +349,21 @@ export interface Database {
           id: string
           kit_id: string
           category_id: string
-          subcategory_id: string
+          subcategory_id: string | null
           created_at: string
         }
         Insert: {
           id?: string
           kit_id: string
           category_id: string
-          subcategory_id: string
+          subcategory_id?: string | null
           created_at?: string
         }
         Update: {
           id?: string
           kit_id?: string
           category_id?: string
-          subcategory_id?: string
+          subcategory_id?: string | null
           created_at?: string
         }
         Relationships: [
