@@ -113,9 +113,9 @@ export async function getPrompts(): Promise<Prompt[]> {
           id: cat.id,
           prompt_id: cat.prompt_id,
           category_id: cat.category_id,
-          subcategory_id: cat.subcategory_id,
+          subcategory_id: cat.subcategory_id ?? null,
           category_name: cat.categories?.name || '',
-          subcategory_name: cat.subcategories?.name
+          subcategory_name: cat.subcategories?.name ?? null
         }));
 
       const promptTools: PromptTool[] = (toolsData || [])
@@ -186,9 +186,9 @@ export async function getPromptById(id: string): Promise<Prompt | null> {
         id: cat.id,
         prompt_id: cat.prompt_id,
         category_id: cat.category_id,
-        subcategory_id: cat.subcategory_id,
+        subcategory_id: cat.subcategory_id ?? null,
         category_name: cat.categories?.name || '',
-        subcategory_name: cat.subcategories?.name
+        subcategory_name: cat.subcategories?.name ?? null
       }));
 
     const promptTools: PromptTool[] = (toolsData || [])
@@ -234,7 +234,7 @@ export async function createPrompt(promptData: CreatePromptData): Promise<Prompt
       const categoryInserts = promptData.category_ids.map((categoryId, index) => ({
         prompt_id: newPrompt.id,
         category_id: categoryId,
-        subcategory_id: promptData.subcategory_ids?.[index] || categoryId // fallback to categoryId if no subcategory
+        subcategory_id: promptData.subcategory_ids?.[index] || null // null if no subcategory provided
       }));
 
       const { error: categoryError } = await supabase

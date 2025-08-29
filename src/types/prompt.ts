@@ -61,9 +61,9 @@ export interface PromptCategory {
   id: string;
   prompt_id: string;
   category_id: string;
-  subcategory_id?: string | null;
+  subcategory_id: string | null;
   category_name: string;
-  subcategory_name?: string | null;
+  subcategory_name: string | null;
 }
 
 export interface PromptTool {

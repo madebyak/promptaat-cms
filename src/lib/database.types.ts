@@ -303,21 +303,21 @@ export interface Database {
           id: string
           prompt_id: string
           category_id: string
-          subcategory_id: string
+          subcategory_id: string | null
           created_at: string
         }
         Insert: {
           id?: string
           prompt_id: string
           category_id: string
-          subcategory_id: string
+          subcategory_id?: string | null
           created_at?: string
         }
         Update: {
           id?: string
           prompt_id?: string
           category_id?: string
-          subcategory_id?: string
+          subcategory_id?: string | null
           created_at?: string
         }
         Relationships: [

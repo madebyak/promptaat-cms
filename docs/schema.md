@@ -101,10 +101,18 @@ CREATE TABLE prompt_categories (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     prompt_id UUID REFERENCES prompts(id) ON DELETE CASCADE,
     category_id UUID REFERENCES categories(id) ON DELETE CASCADE,
-    subcategory_id UUID REFERENCES subcategories(id) ON DELETE CASCADE,
-    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
-    UNIQUE(prompt_id, category_id, subcategory_id)
+    subcategory_id UUID REFERENCES subcategories(id) ON DELETE CASCADE, -- Made nullable to allow category-only associations
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
+
+-- Create unique constraints that handle NULLs properly
+CREATE UNIQUE INDEX prompt_categories_unique_with_nulls 
+ON prompt_categories (prompt_id, category_id) 
+WHERE subcategory_id IS NULL;
+
+CREATE UNIQUE INDEX prompt_categories_unique_with_subcategory 
+ON prompt_categories (prompt_id, category_id, subcategory_id) 
+WHERE subcategory_id IS NOT NULL;
 
 -- Prompt kit categories junction table
 CREATE TABLE kit_categories (
