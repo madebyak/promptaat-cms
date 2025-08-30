@@ -120,7 +120,7 @@ export function CategoryTree({ categories, onEdit, onDelete, onReorder }: Catego
 
   return (
     <div className="bg-background border border-border rounded-lg">
-      <div className="p-4 overflow-visible">
+      <div className="p-2 sm:p-4 overflow-visible">
         <div className="space-y-1 overflow-visible">
           {sortedCategories
             // Only show main categories and subcategories (with children or parentId not null)

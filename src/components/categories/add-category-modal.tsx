@@ -210,7 +210,7 @@ export function AddCategoryModal({ isOpen, onClose, onSuccess, categories }: Add
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className="space-y-0">
-          <div className="px-6 py-4 space-y-8 max-h-[60vh] overflow-y-auto scroll-smooth
+          <div className="px-4 sm:px-6 py-4 space-y-6 sm:space-y-8 max-h-[60vh] overflow-y-auto scroll-smooth
                           scrollbar-thin scrollbar-track-muted scrollbar-thumb-muted-foreground">
             {/* Parent Category Selection */}
             <div className="space-y-3">

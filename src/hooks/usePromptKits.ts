@@ -45,11 +45,16 @@ export function usePromptKits(): UsePromptKitsReturn {
 
   const loadPromptKits = async () => {
     try {
+      console.log('usePromptKits: Starting to load prompt kits...');
       const data = await getPromptKits();
+      console.log('usePromptKits: Received data:', data.length, 'kits');
       setPromptKits(data);
     } catch (error) {
-      console.error('Failed to load prompt kits:', error);
+      console.error('usePromptKits: Failed to load prompt kits:', error);
+      // Set empty array on error so UI shows "no kits found" instead of loading forever
+      setPromptKits([]);
     } finally {
+      console.log('usePromptKits: Setting loading to false');
       setLoading(false);
     }
   };

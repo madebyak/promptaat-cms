@@ -231,6 +231,8 @@ const mockPromptKits: PromptKit[] = [
 export async function getPromptKits(): Promise<PromptKit[]> {
   return withAuthRetry(async () => {
     try {
+      console.log('Fetching prompt kits from database...');
+      
       // Get all prompt kits
       const { data: promptKits, error } = await supabase
         .from('prompt_kits')
@@ -242,8 +244,20 @@ export async function getPromptKits(): Promise<PromptKit[]> {
         throw error;
       }
 
+      console.log(`Found ${promptKits?.length || 0} prompt kits in database`);
+
+      // If no prompt kits found, return mock data in development
+      if (!promptKits || promptKits.length === 0) {
+        console.warn('No prompt kits found in database');
+        if (process.env.NODE_ENV === 'development') {
+          console.warn('Using mock prompt kits data as fallback');
+          return mockPromptKits;
+        }
+        return [];
+      }
+
       // For each prompt kit, get its categories, subcategories, and tools
-      const kitsWithCategories = await Promise.all((promptKits || []).map(async (kit) => {
+      const kitsWithCategories = await Promise.all(promptKits.map(async (kit) => {
         // Get categories for this kit
         const { data: kitCategories, error: catError } = await supabase
           .from('kit_categories')
@@ -284,12 +298,13 @@ export async function getPromptKits(): Promise<PromptKit[]> {
         return mapKitToClientFormat(kit, categories, subcategories, tool_ids);
       }));
 
+      console.log(`Successfully processed ${kitsWithCategories.length} prompt kits with categories`);
       return kitsWithCategories;
     } catch (error) {
       console.error('Failed to load prompt kits:', error);
       // Fallback to mock data in development
       if (process.env.NODE_ENV === 'development') {
-        console.warn('Using mock prompt kits data as fallback');
+        console.warn('Using mock prompt kits data as fallback due to error');
         return mockPromptKits;
       }
       throw error;

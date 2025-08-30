@@ -67,7 +67,7 @@ export function Dialog({ isOpen, onClose, children, className = '', maxWidth }: 
 
   return (
     <div
-      className={`fixed inset-0 z-50 flex items-center justify-center p-4 ${className}`}
+      className={`fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4 ${className}`}
       onClick={handleBackdropClick}
     >
       {/* Backdrop */}
@@ -77,7 +77,7 @@ export function Dialog({ isOpen, onClose, children, className = '', maxWidth }: 
       <div
         ref={dialogRef}
         className={`relative bg-background border border-border rounded-lg shadow-lg 
-                   ${maxWidth || 'max-w-2xl'} w-full max-h-[90vh] overflow-hidden
+                   ${maxWidth || 'max-w-2xl'} w-full max-h-[95vh] sm:max-h-[90vh] overflow-hidden
                    animate-in fade-in-0 zoom-in-95 duration-200
                    ${maxWidth ? '' : 'sm:max-w-lg md:max-w-xl lg:max-w-2xl'}`}
         role="dialog"
@@ -99,7 +99,7 @@ export function DialogContent({ children, className = '' }: DialogContentProps) 
 
 export function DialogHeader({ children, className = '' }: DialogHeaderProps) {
   return (
-    <div className={`flex items-center justify-between p-6 border-b border-border ${className}`}>
+    <div className={`flex items-center justify-between p-4 sm:p-6 border-b border-border ${className}`}>
       {children}
     </div>
   );
@@ -123,7 +123,7 @@ export function DialogDescription({ children, className = '' }: DialogDescriptio
 
 export function DialogFooter({ children, className = '' }: DialogFooterProps) {
   return (
-    <div className={`flex items-center justify-end p-6 border-t border-border bg-muted/20 ${className}`}>
+    <div className={`flex items-center justify-end p-4 sm:p-6 border-t border-border bg-muted/20 ${className}`}>
       {children}
     </div>
   );

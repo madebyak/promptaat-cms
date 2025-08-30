@@ -117,17 +117,18 @@ export function CategoryItem({ category, level = 0, onEdit, onDelete, isDraggabl
     <div>
       {/* Category Row */}
       <div 
-        className="group flex items-center justify-between py-3 px-4 hover:bg-accent rounded-lg transition-colors cursor-pointer"
-        style={{ paddingLeft: `${16 + indentLevel}px` }}
+        className="group flex items-center justify-between py-3 px-2 sm:px-4 hover:bg-accent rounded-lg transition-colors cursor-pointer"
+        style={{ paddingLeft: `${8 + indentLevel}px` }}
         onClick={handleToggle}
         onMouseEnter={() => setShowActions(true)}
         onMouseLeave={() => setShowActions(false)}
+        onTouchStart={() => setShowActions(true)}
       >
         <div className="flex items-center gap-3 flex-1">
           {/* Drag Handle - show for main categories */}
           {isDraggable && isMainCategory && (
-            <div className="w-4 h-4 flex items-center justify-center cursor-grab hover:text-foreground" title="Drag to reorder">
-              <GripVertical className="h-4 w-4 text-muted-foreground transition-colors" />
+            <div className="w-6 h-6 sm:w-4 sm:h-4 flex items-center justify-center cursor-grab hover:text-foreground touch-manipulation" title="Drag to reorder">
+              <GripVertical className="h-5 w-5 sm:h-4 sm:w-4 text-muted-foreground transition-colors" />
             </div>
           )}
 
@@ -164,37 +165,38 @@ export function CategoryItem({ category, level = 0, onEdit, onDelete, isDraggabl
           </div>
 
           {/* Category Info */}
-          <div className="flex-1">
-            <div className="flex items-center gap-2">
-              <span className="font-medium text-foreground">{category.name}</span>
+          <div className="flex-1 min-w-0">
+            <div className="flex items-center gap-2 flex-wrap">
+              <span className="font-medium text-foreground text-sm sm:text-base truncate">{category.name}</span>
               {category.isActive === false && (
-                <span className="px-2 py-1 text-xs bg-yellow-100 text-yellow-800 rounded-full">
+                <span className="px-2 py-1 text-xs bg-yellow-100 text-yellow-800 rounded-full shrink-0">
                   Inactive
                 </span>
               )}
             </div>
             {category.description && (
-              <p className="text-sm text-muted-foreground mt-1">{category.description}</p>
+              <p className="text-xs sm:text-sm text-muted-foreground mt-1 line-clamp-2 sm:line-clamp-none">{category.description}</p>
             )}
           </div>
 
           {/* Post Count */}
-          <div className="text-sm text-muted-foreground">
-            {category.postCount || 0} posts
+          <div className="text-xs sm:text-sm text-muted-foreground shrink-0">
+            <span className="hidden sm:inline">{category.postCount || 0} posts</span>
+            <span className="sm:hidden">{category.postCount || 0}</span>
           </div>
 
           {/* Actions */}
-          <div className={`flex items-center gap-1 ${showActions ? 'opacity-100' : 'opacity-0'} transition-opacity`}>
+          <div className={`flex items-center gap-1 ${showActions ? 'opacity-100' : 'opacity-0 sm:opacity-0'} sm:transition-opacity transition-opacity`}>
             <button
               onClick={handleEdit}
-              className="p-1 text-muted-foreground hover:text-blue-600 transition-colors"
+              className="p-2 sm:p-1 text-muted-foreground hover:text-blue-600 transition-colors touch-manipulation"
               title="Edit category"
             >
               <Pencil className="h-4 w-4" />
             </button>
             <button
               onClick={handleDelete}
-              className="p-1 text-muted-foreground hover:text-red-600 transition-colors"
+              className="p-2 sm:p-1 text-muted-foreground hover:text-red-600 transition-colors touch-manipulation"
               title="Delete category"
             >
               <Trash2 className="h-4 w-4" />
@@ -205,7 +207,7 @@ export function CategoryItem({ category, level = 0, onEdit, onDelete, isDraggabl
 
       {/* Subcategories - Only show for main categories (level 0) */}
       {hasChildren && isExpanded && level === 0 && (
-        <div className="ml-4 overflow-visible">
+        <div className="ml-2 sm:ml-4 overflow-visible">
           {sortedSubcategories.map((subcategory, index) => (
             <div
               key={subcategory.id}
@@ -222,16 +224,17 @@ export function CategoryItem({ category, level = 0, onEdit, onDelete, isDraggabl
             >
               {/* Render subcategory as a simple item without further nesting */}
               <div 
-                className="group flex items-center justify-between py-3 px-4 hover:bg-accent rounded-lg transition-colors cursor-pointer"
-                style={{ paddingLeft: `${16 + (level + 1) * 20}px` }}
+                className="group flex items-center justify-between py-3 px-2 sm:px-4 hover:bg-accent rounded-lg transition-colors cursor-pointer"
+                style={{ paddingLeft: `${8 + (level + 1) * 12}px` }}
                 onMouseEnter={() => setShowSubcategoryActions(prev => ({ ...prev, [subcategory.id]: true }))}
                 onMouseLeave={() => setShowSubcategoryActions(prev => ({ ...prev, [subcategory.id]: false }))}
+                onTouchStart={() => setShowSubcategoryActions(prev => ({ ...prev, [subcategory.id]: true }))}
               >
                 <div className="flex items-center gap-3 flex-1">
                   {/* Drag Handle for subcategories */}
                   {isDraggable && (
-                    <div className="w-4 h-4 flex items-center justify-center cursor-grab hover:text-foreground" title="Drag to reorder">
-                      <GripVertical className="h-4 w-4 text-muted-foreground transition-colors" />
+                    <div className="w-6 h-6 sm:w-4 sm:h-4 flex items-center justify-center cursor-grab hover:text-foreground touch-manipulation" title="Drag to reorder">
+                      <GripVertical className="h-5 w-5 sm:h-4 sm:w-4 text-muted-foreground transition-colors" />
                     </div>
                   )}
 
@@ -246,33 +249,34 @@ export function CategoryItem({ category, level = 0, onEdit, onDelete, isDraggabl
                   </div>
 
                   {/* Subcategory Info */}
-                  <div className="flex-1">
-                    <div className="flex items-center gap-2">
-                      <span className="font-medium text-foreground">{subcategory.name}</span>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <span className="font-medium text-foreground text-sm sm:text-base truncate">{subcategory.name}</span>
                       {subcategory.isActive === false && (
-                        <span className="px-2 py-1 text-xs bg-yellow-100 text-yellow-800 rounded-full">
+                        <span className="px-2 py-1 text-xs bg-yellow-100 text-yellow-800 rounded-full shrink-0">
                           Inactive
                         </span>
                       )}
                     </div>
                     {subcategory.description && (
-                      <p className="text-sm text-muted-foreground mt-1">{subcategory.description}</p>
+                      <p className="text-xs sm:text-sm text-muted-foreground mt-1 line-clamp-2 sm:line-clamp-none">{subcategory.description}</p>
                     )}
                   </div>
 
                   {/* Post Count */}
-                  <div className="text-sm text-muted-foreground">
-                    {subcategory.postCount || 0} posts
+                  <div className="text-xs sm:text-sm text-muted-foreground shrink-0">
+                    <span className="hidden sm:inline">{subcategory.postCount || 0} posts</span>
+                    <span className="sm:hidden">{subcategory.postCount || 0}</span>
                   </div>
 
                   {/* Actions */}
-                  <div className={`flex items-center gap-1 ${showSubcategoryActions[subcategory.id] ? 'opacity-100' : 'opacity-0'} transition-opacity`}>
+                  <div className={`flex items-center gap-1 ${showSubcategoryActions[subcategory.id] ? 'opacity-100' : 'opacity-0 sm:opacity-0'} sm:transition-opacity transition-opacity`}>
                     <button
                       onClick={(e) => {
                         e.stopPropagation();
                         onEdit?.(subcategory);
                       }}
-                      className="p-1 text-muted-foreground hover:text-blue-600 transition-colors"
+                      className="p-2 sm:p-1 text-muted-foreground hover:text-blue-600 transition-colors touch-manipulation"
                       title="Edit subcategory"
                     >
                       <Pencil className="h-4 w-4" />
@@ -282,7 +286,7 @@ export function CategoryItem({ category, level = 0, onEdit, onDelete, isDraggabl
                         e.stopPropagation();
                         onDelete?.(subcategory);
                       }}
-                      className="p-1 text-muted-foreground hover:text-red-600 transition-colors"
+                      className="p-2 sm:p-1 text-muted-foreground hover:text-red-600 transition-colors touch-manipulation"
                       title="Delete subcategory"
                     >
                       <Trash2 className="h-4 w-4" />

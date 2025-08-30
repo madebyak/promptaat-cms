@@ -58,21 +58,22 @@ export default function PromptKitsPage() {
   ];
 
   return (
-    <div className="container mx-auto px-6 py-8">
-      <div className="flex justify-between items-center mb-6">
-        <div>
-          <h1 className="text-3xl font-bold text-foreground mb-2">Prompt Kits</h1>
-          <p className="text-muted-foreground">
+    <div className="container mx-auto px-4 sm:px-6 py-6 sm:py-8">
+      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 mb-6">
+        <div className="flex-1">
+          <h1 className="text-2xl sm:text-3xl font-bold text-foreground mb-2">Prompt Kits</h1>
+          <p className="text-sm sm:text-base text-muted-foreground">
             Manage your prompt collections ({stats.totalKits} kits)
           </p>
         </div>
         <Button
           onClick={handleAddPromptKit}
-          className="text-white"
+          className="text-white w-full sm:w-auto"
           style={{backgroundColor: '#A2AADB'}}
+          size="sm"
         >
-          <Plus className="h-4 w-4 mr-2" />
-          Add Prompt Kit
+          <Plus className="h-4 w-4" />
+          <span className="ml-2">Add Prompt Kit</span>
         </Button>
       </div>
 
@@ -129,9 +130,9 @@ export default function PromptKitsPage() {
 
       {/* Search and Filter */}
       <div className="mb-6">
-        <div className="flex flex-col md:flex-row gap-4">
+        <div className="flex flex-col lg:flex-row gap-4">
           <div className="flex-1">
-            <div className="flex flex-col md:flex-row gap-4">
+            <div className="flex flex-col sm:flex-row gap-4">
               <div className="flex-1">
                 <SearchInput
                   value={searchQuery}
@@ -139,11 +140,11 @@ export default function PromptKitsPage() {
                   placeholder="Search kits by name, description, or keywords..."
                 />
               </div>
-              <div className="w-48">
+              <div className="w-full sm:w-40 md:w-48">
                 <select
                   value={tierFilter}
                   onChange={(e) => setTierFilter(e.target.value)}
-                  className="w-full px-4 py-2 border border-border rounded-md bg-background focus:outline-none focus:ring-2 focus:ring-primary/20"
+                  className="w-full px-4 py-2 border border-border rounded-md bg-background focus:outline-none focus:ring-2 focus:ring-primary/20 text-sm"
                 >
                   <option value="">All Tiers</option>
                   {tierFilterOptions.map(option => (
@@ -153,11 +154,11 @@ export default function PromptKitsPage() {
                   ))}
                 </select>
               </div>
-              <div className="w-48">
+              <div className="w-full sm:w-40 md:w-48">
                 <select
                   value={visibilityFilter}
                   onChange={(e) => setVisibilityFilter(e.target.value)}
-                  className="w-full px-4 py-2 border border-border rounded-md bg-background focus:outline-none focus:ring-2 focus:ring-primary/20"
+                  className="w-full px-4 py-2 border border-border rounded-md bg-background focus:outline-none focus:ring-2 focus:ring-primary/20 text-sm"
                 >
                   <option value="">All Visibility</option>
                   {visibilityFilterOptions.map(option => (
@@ -169,7 +170,7 @@ export default function PromptKitsPage() {
               </div>
             </div>
           </div>
-          <div className="w-full md:w-64">
+          <div className="w-full lg:w-64">
             <ColumnVisibility
               columns={promptKitTableColumns}
               visibleColumns={visibleColumns}

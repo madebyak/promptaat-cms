@@ -93,28 +93,31 @@ export default function CategoriesPage() {
 
   return (
     <ProtectedRoute requireAdmin={true}>
-      <div className="container mx-auto px-6 py-8">
-      <div className="flex justify-between items-center mb-6">
-        <div>
-          <h1 className="text-3xl font-bold text-foreground mb-2">Categories</h1>
-          <p className="text-muted-foreground">
+      <div className="container mx-auto px-4 sm:px-6 py-6 sm:py-8">
+      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 mb-6">
+        <div className="flex-1">
+          <h1 className="text-2xl sm:text-3xl font-bold text-foreground mb-2">Categories</h1>
+          <p className="text-sm sm:text-base text-muted-foreground">
             Manage your content categories ({stats.totalCategories} categories, {stats.totalPosts} posts)
           </p>
         </div>
-        <div className="flex gap-2">
+        <div className="flex flex-col sm:flex-row gap-2 sm:gap-2">
           <Button
             onClick={handleFixSortOrders}
             variant="outline"
             disabled={isFixingSortOrders}
-            className="text-orange-600 border-orange-600 hover:bg-orange-50"
+            className="text-orange-600 border-orange-600 hover:bg-orange-50 w-full sm:w-auto"
+            size="sm"
           >
             <RefreshCw className={`h-4 w-4 ${isFixingSortOrders ? 'animate-spin' : ''}`} />
-            {isFixingSortOrders ? 'Fixing...' : 'Fix Sort Orders'}
+            <span className="hidden sm:inline">{isFixingSortOrders ? 'Fixing...' : 'Fix Sort Orders'}</span>
+            <span className="sm:hidden">{isFixingSortOrders ? 'Fixing...' : 'Fix Orders'}</span>
           </Button>
           <Button
             onClick={handleAddCategory}
-            className="text-white"
+            className="text-white w-full sm:w-auto"
             style={{backgroundColor: '#A2AADB'}}
+            size="sm"
           >
             <Plus className="h-4 w-4" />
             Add Category
@@ -143,10 +146,11 @@ export default function CategoriesPage() {
         </div>
       ) : (
         <div>
-          <div className="mb-2 text-sm text-muted-foreground">
+          <div className="mb-2 text-xs sm:text-sm text-muted-foreground">
             <span className="flex items-center gap-1">
               <GripVertical className="h-4 w-4" />
-              Drag and drop categories to reorder them
+              <span className="hidden sm:inline">Drag and drop categories to reorder them</span>
+              <span className="sm:hidden">Tap and drag to reorder</span>
             </span>
           </div>
           <CategoryTree 

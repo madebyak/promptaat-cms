@@ -237,7 +237,7 @@ export function EditCategoryModal({ isOpen, onClose, onSuccess, categories, cate
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className="space-y-0">
-          <div className="px-6 py-4 space-y-8 max-h-[60vh] overflow-y-auto scroll-smooth
+          <div className="px-4 sm:px-6 py-4 space-y-6 sm:space-y-8 max-h-[60vh] overflow-y-auto scroll-smooth
                           scrollbar-thin scrollbar-track-muted scrollbar-thumb-muted-foreground">
             
             {/* Show parent info for subcategories (read-only) */}

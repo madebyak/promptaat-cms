@@ -233,52 +233,182 @@ export function PromptsTable({
   }
 
   return (
-    <div className="bg-background border border-border rounded-lg overflow-x-auto">
-      <table className="w-full">
-        <thead className="bg-muted">
-          <tr>
-            {promptTableColumns
-              .filter(col => visibleColumns.includes(col.id))
-              .map(column => (
-                <TableHeader 
-                  key={column.id}
-                  sortKey={column.id !== 'actions' ? column.id : undefined}
-                  currentSort={sortColumn}
-                  sortDirection={sortDirection}
-                  onSort={handleSort}
-                >
-                  {column.label}
-                </TableHeader>
-              ))}
-          </tr>
-        </thead>
-        <tbody className="divide-y divide-border">
-          {prompts.map((prompt) => (
-            <tr key={prompt.id} className="hover:bg-accent transition-colors">
-              {visibleColumns.includes('name') && (
-                <TableCell>
-                  <div className="font-medium text-sm">{prompt.name}</div>
-                </TableCell>
-              )}
-              
-              {visibleColumns.includes('description') && (
-                <TableCell>
-                  <div className="text-sm text-muted-foreground">
-                    <TruncateText text={prompt.description} maxLength={60} />
-                  </div>
-                </TableCell>
-              )}
+    <div className="bg-background border border-border rounded-lg">
+      {/* Desktop Table View */}
+      <div className="hidden lg:block overflow-x-auto">
+        <table className="w-full">
+          <thead className="bg-muted">
+            <tr>
+              {promptTableColumns
+                .filter(col => visibleColumns.includes(col.id))
+                .map(column => (
+                  <TableHeader 
+                    key={column.id}
+                    sortKey={column.id !== 'actions' ? column.id : undefined}
+                    currentSort={sortColumn}
+                    sortDirection={sortDirection}
+                    onSort={handleSort}
+                  >
+                    {column.label}
+                  </TableHeader>
+                ))}
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-border">
+            {prompts.map((prompt) => (
+              <tr key={prompt.id} className="hover:bg-accent transition-colors">
+                {visibleColumns.includes('name') && (
+                  <TableCell>
+                    <div className="font-medium text-sm">{prompt.name}</div>
+                  </TableCell>
+                )}
+                
+                {visibleColumns.includes('description') && (
+                  <TableCell>
+                    <div className="text-sm text-muted-foreground">
+                      <TruncateText text={prompt.description} maxLength={60} />
+                    </div>
+                  </TableCell>
+                )}
 
-              {visibleColumns.includes('prompt_content') && (
-                <TableCell>
-                  <div className="text-sm text-muted-foreground">
-                    <TruncateText text={prompt.prompt_content || prompt.promptContent || ''} maxLength={60} />
-                  </div>
-                </TableCell>
-              )}
-              
-              {visibleColumns.includes('tier') && (
-                <TableCell>
+                {visibleColumns.includes('prompt_content') && (
+                  <TableCell>
+                    <div className="text-sm text-muted-foreground">
+                      <TruncateText text={prompt.prompt_content || prompt.promptContent || ''} maxLength={60} />
+                    </div>
+                  </TableCell>
+                )}
+                
+                {visibleColumns.includes('tier') && (
+                  <TableCell>
+                    <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
+                      prompt.tier === 'pro' 
+                        ? 'bg-purple-100 text-purple-800' 
+                        : 'bg-green-100 text-green-800'
+                    }`}>
+                      {prompt.tier === 'pro' ? 'Pro' : 'Free'}
+                    </span>
+                  </TableCell>
+                )}
+                
+                {visibleColumns.includes('visibility') && (
+                  <TableCell>
+                    <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
+                      prompt.visibility === 'published' 
+                        ? 'bg-green-100 text-green-800' 
+                        : 'bg-yellow-100 text-yellow-800'
+                    }`}>
+                      {prompt.visibility.charAt(0).toUpperCase() + prompt.visibility.slice(1)}
+                    </span>
+                  </TableCell>
+                )}
+                
+                {visibleColumns.includes('created_at') && (
+                  <TableCell>
+                    <div className="text-sm text-muted-foreground">
+                      {formatDate(prompt.createdAt)}
+                    </div>
+                  </TableCell>
+                )}
+
+                {visibleColumns.includes('updated_at') && (
+                  <TableCell>
+                    <div className="text-sm text-muted-foreground">
+                      {formatDate(prompt.updatedAt)}
+                    </div>
+                  </TableCell>
+                )}
+                
+                {visibleColumns.includes('rating') && (
+                  <TableCell>
+                    <RatingStars rating={prompt.rating} />
+                  </TableCell>
+                )}
+                
+                {visibleColumns.includes('likes_count') && (
+                  <TableCell>
+                    <div className="text-sm text-muted-foreground">
+                      {prompt.likesCount.toLocaleString()}
+                    </div>
+                  </TableCell>
+                )}
+                
+                {visibleColumns.includes('copies_count') && (
+                  <TableCell>
+                    <div className="text-sm text-muted-foreground">
+                      {prompt.copiesCount.toLocaleString()}
+                    </div>
+                  </TableCell>
+                )}
+                
+                {visibleColumns.includes('categories') && (
+                  <TableCell>
+                    <div className="text-sm text-muted-foreground">
+                      <div className="flex flex-wrap gap-1">
+                        {prompt.categories?.map((cat, index) => (
+                          <span key={index} className="inline-flex px-2 py-1 text-xs bg-blue-100 text-blue-800 rounded">
+                            {cat.category_id}
+                            {cat.subcategory_id && (
+                              <span className="ml-1 text-blue-600">→ {cat.subcategory_id}</span>
+                            )}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                  </TableCell>
+                )}
+                
+                {visibleColumns.includes('tools') && (
+                  <TableCell>
+                    <div className="text-sm text-muted-foreground">
+                      <div className="flex flex-wrap gap-1">
+                        {prompt.tools?.map((tool, index) => (
+                          <span key={index} className="inline-flex items-center px-2 py-1 text-xs bg-gray-100 text-gray-800 rounded">
+                            {tool.tool_id}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                  </TableCell>
+                )}
+                
+                {visibleColumns.includes('actions') && (
+                  <TableCell>
+                    <div className="flex items-center gap-2">
+                      <button
+                        onClick={() => handleEdit(prompt)}
+                        className="p-1 text-muted-foreground hover:text-blue-600 transition-colors"
+                        title="Edit prompt"
+                      >
+                        <Pencil className="h-4 w-4" />
+                      </button>
+                      <button
+                        onClick={() => handleDeleteClick(prompt)}
+                        className="p-1 text-muted-foreground hover:text-red-600 transition-colors"
+                        title="Delete prompt"
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </button>
+                    </div>
+                  </TableCell>
+                )}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+
+      {/* Mobile Card View */}
+      <div className="lg:hidden p-2 space-y-3">
+        {prompts.map((prompt) => (
+          <div
+            key={prompt.id}
+            className="bg-background border border-border rounded-lg p-4 transition-all"
+          >
+            <div className="flex items-start justify-between mb-3">
+              <div className="flex-1 min-w-0">
+                <h3 className="text-sm font-medium text-foreground truncate mb-1">{prompt.name}</h3>
+                <div className="flex items-center gap-2 mb-2">
                   <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
                     prompt.tier === 'pro' 
                       ? 'bg-purple-100 text-purple-800' 
@@ -286,11 +416,6 @@ export function PromptsTable({
                   }`}>
                     {prompt.tier === 'pro' ? 'Pro' : 'Free'}
                   </span>
-                </TableCell>
-              )}
-              
-              {visibleColumns.includes('visibility') && (
-                <TableCell>
                   <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
                     prompt.visibility === 'published' 
                       ? 'bg-green-100 text-green-800' 
@@ -298,102 +423,80 @@ export function PromptsTable({
                   }`}>
                     {prompt.visibility.charAt(0).toUpperCase() + prompt.visibility.slice(1)}
                   </span>
-                </TableCell>
-              )}
+                </div>
+              </div>
               
-              {visibleColumns.includes('created_at') && (
-                <TableCell>
-                  <div className="text-sm text-muted-foreground">
-                    {formatDate(prompt.createdAt)}
-                  </div>
-                </TableCell>
-              )}
+              {/* Actions */}
+              <div className="flex items-center gap-1 ml-2">
+                <button
+                  onClick={() => handleEdit(prompt)}
+                  className="p-2 text-muted-foreground hover:text-blue-600 transition-colors touch-manipulation"
+                  title="Edit prompt"
+                >
+                  <Pencil className="h-4 w-4" />
+                </button>
+                <button
+                  onClick={() => handleDeleteClick(prompt)}
+                  className="p-2 text-muted-foreground hover:text-red-600 transition-colors touch-manipulation"
+                  title="Delete prompt"
+                >
+                  <Trash2 className="h-4 w-4" />
+                </button>
+              </div>
+            </div>
 
-              {visibleColumns.includes('updated_at') && (
-                <TableCell>
-                  <div className="text-sm text-muted-foreground">
-                    {formatDate(prompt.updatedAt)}
-                  </div>
-                </TableCell>
-              )}
-              
-              {visibleColumns.includes('rating') && (
-                <TableCell>
+            {/* Description */}
+            {prompt.description && (
+              <p className="text-xs text-muted-foreground mb-3 line-clamp-2">
+                {prompt.description}
+              </p>
+            )}
+
+            {/* Stats */}
+            <div className="flex items-center justify-between text-xs text-muted-foreground">
+              <div className="flex items-center gap-4">
+                <div className="flex items-center gap-1">
                   <RatingStars rating={prompt.rating} />
-                </TableCell>
-              )}
-              
-              {visibleColumns.includes('likes_count') && (
-                <TableCell>
-                  <div className="text-sm text-muted-foreground">
-                    {prompt.likesCount.toLocaleString()}
-                  </div>
-                </TableCell>
-              )}
-              
-              {visibleColumns.includes('copies_count') && (
-                <TableCell>
-                  <div className="text-sm text-muted-foreground">
-                    {prompt.copiesCount.toLocaleString()}
-                  </div>
-                </TableCell>
-              )}
-              
-              {visibleColumns.includes('categories') && (
-                <TableCell>
-                  <div className="text-sm text-muted-foreground">
+                </div>
+                <span>❤️ {prompt.likesCount.toLocaleString()}</span>
+                <span>📋 {prompt.copiesCount.toLocaleString()}</span>
+              </div>
+            </div>
+
+            {/* Categories and Tools */}
+            {((prompt.categories?.length ?? 0) > 0 || (prompt.tools?.length ?? 0) > 0) && (
+              <div className="mt-3 pt-3 border-t border-border">
+                {prompt.categories?.length > 0 && (
+                  <div className="mb-2">
                     <div className="flex flex-wrap gap-1">
-                      {prompt.categories?.map((cat, index) => (
+                      {prompt.categories.slice(0, 3).map((cat, index) => (
                         <span key={index} className="inline-flex px-2 py-1 text-xs bg-blue-100 text-blue-800 rounded">
                           {cat.category_id}
-                          {cat.subcategory_id && (
-                            <span className="ml-1 text-blue-600">→ {cat.subcategory_id}</span>
-                          )}
                         </span>
                       ))}
+                      {prompt.categories.length > 3 && (
+                        <span className="text-xs text-muted-foreground">+{prompt.categories.length - 3} more</span>
+                      )}
                     </div>
                   </div>
-                </TableCell>
-              )}
-              
-              {visibleColumns.includes('tools') && (
-                <TableCell>
-                  <div className="text-sm text-muted-foreground">
-                    <div className="flex flex-wrap gap-1">
-                      {prompt.tools?.map((tool, index) => (
-                        <span key={index} className="inline-flex items-center px-2 py-1 text-xs bg-gray-100 text-gray-800 rounded">
-                          {tool.tool_id}
-                        </span>
-                      ))}
-                    </div>
+                )}
+                {(prompt.tools?.length ?? 0) > 0 && (
+                  <div className="flex flex-wrap gap-1">
+                    {prompt.tools?.slice(0, 2).map((tool, index) => (
+                      <span key={index} className="inline-flex items-center px-2 py-1 text-xs bg-gray-100 text-gray-800 rounded">
+                        {tool.tool_id}
+                      </span>
+                    ))}
+                    {(prompt.tools?.length ?? 0) > 2 && (
+                      <span className="text-xs text-muted-foreground">+{(prompt.tools?.length ?? 0) - 2} more</span>
+                    )}
                   </div>
-                </TableCell>
-              )}
-              
-              {visibleColumns.includes('actions') && (
-                <TableCell>
-                  <div className="flex items-center gap-2">
-                    <button
-                      onClick={() => handleEdit(prompt)}
-                      className="p-1 text-muted-foreground hover:text-blue-600 transition-colors"
-                      title="Edit prompt"
-                    >
-                      <Pencil className="h-4 w-4" />
-                    </button>
-                    <button
-                      onClick={() => handleDeleteClick(prompt)}
-                      className="p-1 text-muted-foreground hover:text-red-600 transition-colors"
-                      title="Delete prompt"
-                    >
-                      <Trash2 className="h-4 w-4" />
-                    </button>
-                  </div>
-                </TableCell>
-              )}
-            </tr>
-          ))}
-        </tbody>
-      </table>
+                )}
+              </div>
+            )}
+          </div>
+        ))}
+      </div>
 
       {/* Delete Confirmation Dialog */}
       <DeleteConfirmDialog

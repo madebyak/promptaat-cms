@@ -138,13 +138,13 @@ export function ToolsTable({ tools: initialTools, onReorder, onEdit, onDelete }:
   };
 
   // HTML5 Drag and Drop handlers
-  const handleDragStart = (e: React.DragEvent<HTMLTableRowElement>, toolId: string) => {
+  const handleDragStart = (e: React.DragEvent<HTMLTableRowElement | HTMLDivElement>, toolId: string) => {
     setDraggedItemId(toolId);
     e.dataTransfer.effectAllowed = 'move';
     e.dataTransfer.setData('text/html', toolId);
   };
 
-  const handleDragOver = (e: React.DragEvent<HTMLTableRowElement>, index: number) => {
+  const handleDragOver = (e: React.DragEvent<HTMLTableRowElement | HTMLDivElement>, index: number) => {
     e.preventDefault();
     e.dataTransfer.dropEffect = 'move';
     setDraggedOverIndex(index);
@@ -154,7 +154,7 @@ export function ToolsTable({ tools: initialTools, onReorder, onEdit, onDelete }:
     setDraggedOverIndex(null);
   };
 
-  const handleDrop = (e: React.DragEvent<HTMLTableRowElement>, dropIndex: number) => {
+  const handleDrop = (e: React.DragEvent<HTMLTableRowElement | HTMLDivElement>, dropIndex: number) => {
     e.preventDefault();
     
     if (!draggedItemId) return;
@@ -208,113 +208,194 @@ export function ToolsTable({ tools: initialTools, onReorder, onEdit, onDelete }:
   }
 
   return (
-    <div className="bg-background border border-border rounded-lg overflow-x-auto">
-      <table className="w-full">
-        <thead className="bg-muted">
-          <tr>
-            {/* Drag handle column */}
-            <th className="w-10 px-3"></th>
-            <TableHeader 
-              sortKey={!draggedItemId ? "name" : undefined}
-              currentSort={sortColumn}
-              sortDirection={sortDirection}
-              onSort={handleSort}
-            >
-              Tool
-            </TableHeader>
-            <TableHeader 
-              sortKey={!draggedItemId ? "website_link" : undefined}
-              currentSort={sortColumn}
-              sortDirection={sortDirection}
-              onSort={handleSort}
-            >
-              Website Link
-            </TableHeader>
-            <TableHeader 
-              sortKey={!draggedItemId ? "sort_order" : undefined}
-              currentSort={sortColumn}
-              sortDirection={sortDirection}
-              onSort={handleSort}
-            >
-              Sort Order
-            </TableHeader>
-            <TableHeader>Actions</TableHeader>
-          </tr>
-        </thead>
-        <tbody className="divide-y divide-border">
-          {tools.map((tool, index) => (
-            <tr
-              key={tool.id}
-              draggable
-              onDragStart={(e) => handleDragStart(e, tool.id)}
-              onDragOver={(e) => handleDragOver(e, index)}
-              onDragLeave={handleDragLeave}
-              onDrop={(e) => handleDrop(e, index)}
-              onDragEnd={handleDragEnd}
-              className={`hover:bg-accent transition-colors cursor-move ${
-                draggedItemId === tool.id ? 'opacity-50' : ''
-              } ${
-                draggedOverIndex === index && draggedItemId !== tool.id ? 'bg-accent border-t-2 border-primary' : ''
-              }`}
-            >
-              {/* Drag handle */}
-              <td className="w-10 px-3">
-                <GripVertical className="h-5 w-5 text-muted-foreground cursor-grab" />
-              </td>
-              <TableCell>
-                <div className="flex items-center gap-3">
-                  {tool.image_url ? (
-                    <img 
-                      src={tool.image_url} 
-                      alt={tool.name}
-                      className="h-10 w-10 object-contain rounded-md bg-background border border-border"
-                    />
-                  ) : (
-                    <div className="h-10 w-10 flex items-center justify-center bg-muted rounded-md">
-                      <span className="text-muted-foreground">No img</span>
+    <div className="bg-background border border-border rounded-lg">
+      {/* Desktop Table View */}
+      <div className="hidden md:block overflow-x-auto">
+        <table className="w-full">
+          <thead className="bg-muted">
+            <tr>
+              {/* Drag handle column */}
+              <th className="w-10 px-3"></th>
+              <TableHeader 
+                sortKey={!draggedItemId ? "name" : undefined}
+                currentSort={sortColumn}
+                sortDirection={sortDirection}
+                onSort={handleSort}
+              >
+                Tool
+              </TableHeader>
+              <TableHeader 
+                sortKey={!draggedItemId ? "website_link" : undefined}
+                currentSort={sortColumn}
+                sortDirection={sortDirection}
+                onSort={handleSort}
+              >
+                Website Link
+              </TableHeader>
+              <TableHeader 
+                sortKey={!draggedItemId ? "sort_order" : undefined}
+                currentSort={sortColumn}
+                sortDirection={sortDirection}
+                onSort={handleSort}
+              >
+                Sort Order
+              </TableHeader>
+              <TableHeader>Actions</TableHeader>
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-border">
+            {tools.map((tool, index) => (
+              <tr
+                key={tool.id}
+                draggable
+                onDragStart={(e) => handleDragStart(e, tool.id)}
+                onDragOver={(e) => handleDragOver(e, index)}
+                onDragLeave={handleDragLeave}
+                onDrop={(e) => handleDrop(e, index)}
+                onDragEnd={handleDragEnd}
+                className={`hover:bg-accent transition-colors cursor-move ${
+                  draggedItemId === tool.id ? 'opacity-50' : ''
+                } ${
+                  draggedOverIndex === index && draggedItemId !== tool.id ? 'bg-accent border-t-2 border-primary' : ''
+                }`}
+              >
+                {/* Drag handle */}
+                <td className="w-10 px-3">
+                  <GripVertical className="h-5 w-5 text-muted-foreground cursor-grab" />
+                </td>
+                <TableCell>
+                  <div className="flex items-center gap-3">
+                    {tool.image_url ? (
+                      <img 
+                        src={tool.image_url} 
+                        alt={tool.name}
+                        className="h-10 w-10 object-contain rounded-md bg-background border border-border"
+                      />
+                    ) : (
+                      <div className="h-10 w-10 flex items-center justify-center bg-muted rounded-md">
+                        <span className="text-xs text-muted-foreground">No img</span>
+                      </div>
+                    )}
+                    <div className="text-sm font-medium">{tool.name}</div>
+                  </div>
+                </TableCell>
+                <TableCell>
+                  {tool.website_link ? (
+                    <div 
+                      className="flex items-center gap-2 text-sm text-primary hover:underline cursor-pointer"
+                      onClick={() => handleVisitWebsite(tool.website_link)}
+                    >
+                      <span className="truncate max-w-[250px]">{tool.website_link}</span>
+                      <ExternalLink className="h-4 w-4" />
                     </div>
+                  ) : (
+                    <span className="text-sm text-muted-foreground">—</span>
                   )}
-                  <div className="text-sm font-medium">{tool.name}</div>
+                </TableCell>
+                <TableCell>
+                  <span className="text-sm">{tool.sort_order}</span>
+                </TableCell>
+                <TableCell>
+                  <div className="flex items-center gap-2">
+                    <button
+                      onClick={() => handleEditClick(tool)}
+                      className="p-1 text-muted-foreground hover:text-blue-600 transition-colors"
+                      title="Edit tool"
+                    >
+                      <Pencil className="h-4 w-4" />
+                    </button>
+                    <button
+                      onClick={() => handleDeleteClick(tool)}
+                      className="p-1 text-muted-foreground hover:text-red-600 transition-colors"
+                      title="Delete tool"
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </button>
+                  </div>
+                </TableCell>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+
+      {/* Mobile Card View */}
+      <div className="md:hidden p-2 space-y-2">
+        {tools.map((tool, index) => (
+          <div
+            key={tool.id}
+            draggable
+            onDragStart={(e) => handleDragStart(e, tool.id)}
+            onDragOver={(e) => handleDragOver(e, index)}
+            onDragLeave={handleDragLeave}
+            onDrop={(e) => handleDrop(e, index)}
+            onDragEnd={handleDragEnd}
+            className={`bg-background border border-border rounded-lg p-4 transition-all touch-manipulation ${
+              draggedItemId === tool.id ? 'opacity-50' : ''
+            } ${
+              draggedOverIndex === index && draggedItemId !== tool.id ? 'border-t-4 border-primary' : ''
+            }`}
+          >
+            <div className="flex items-start gap-3">
+              {/* Drag Handle */}
+              <div className="w-6 h-6 flex items-center justify-center cursor-grab hover:text-foreground touch-manipulation mt-1" title="Drag to reorder">
+                <GripVertical className="h-5 w-5 text-muted-foreground transition-colors" />
+              </div>
+
+              {/* Tool Image */}
+              <div className="shrink-0">
+                {tool.image_url ? (
+                  <img 
+                    src={tool.image_url} 
+                    alt={tool.name}
+                    className="h-12 w-12 object-contain rounded-md bg-background border border-border"
+                  />
+                ) : (
+                  <div className="h-12 w-12 flex items-center justify-center bg-muted rounded-md">
+                    <span className="text-xs text-muted-foreground">No img</span>
+                  </div>
+                )}
+              </div>
+
+              {/* Tool Info */}
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center justify-between mb-2">
+                  <h3 className="text-sm font-medium text-foreground truncate">{tool.name}</h3>
+                  <span className="text-xs text-muted-foreground shrink-0 ml-2">#{tool.sort_order}</span>
                 </div>
-              </TableCell>
-              <TableCell>
-                {tool.website_link ? (
+                
+                {tool.website_link && (
                   <div 
-                    className="flex items-center gap-2 text-sm text-primary hover:underline cursor-pointer"
+                    className="flex items-center gap-2 text-xs text-primary hover:underline cursor-pointer mb-2"
                     onClick={() => handleVisitWebsite(tool.website_link)}
                   >
-                    <span className="truncate max-w-[250px]">{tool.website_link}</span>
-                    <ExternalLink className="h-4 w-4" />
+                    <span className="truncate">{tool.website_link}</span>
+                    <ExternalLink className="h-3 w-3 shrink-0" />
                   </div>
-                ) : (
-                  <span className="text-sm text-muted-foreground">—</span>
                 )}
-              </TableCell>
-              <TableCell>
-                <span className="text-sm">{tool.sort_order}</span>
-              </TableCell>
-              <TableCell>
-                <div className="flex items-center gap-2">
+
+                {/* Actions */}
+                <div className="flex items-center gap-1">
                   <button
                     onClick={() => handleEditClick(tool)}
-                    className="p-1 text-muted-foreground hover:text-blue-600 transition-colors"
+                    className="p-2 text-muted-foreground hover:text-blue-600 transition-colors touch-manipulation"
                     title="Edit tool"
                   >
                     <Pencil className="h-4 w-4" />
                   </button>
                   <button
                     onClick={() => handleDeleteClick(tool)}
-                    className="p-1 text-muted-foreground hover:text-red-600 transition-colors"
+                    className="p-2 text-muted-foreground hover:text-red-600 transition-colors touch-manipulation"
                     title="Delete tool"
                   >
                     <Trash2 className="h-4 w-4" />
                   </button>
                 </div>
-              </TableCell>
-            </tr>
-          ))}
-        </tbody>
-      </table>
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
     </div>
   );
 }

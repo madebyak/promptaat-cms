@@ -214,7 +214,7 @@ export function AddToolModal({ isOpen, onClose, onSuccess, tools }: AddToolModal
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className="space-y-0">
-          <div className="px-6 py-4 space-y-8 max-h-[60vh] overflow-y-auto scroll-smooth
+          <div className="px-4 sm:px-6 py-4 space-y-6 sm:space-y-8 max-h-[60vh] overflow-y-auto scroll-smooth
                           scrollbar-thin scrollbar-track-muted scrollbar-thumb-muted-foreground">
             {/* Tool Name */}
             <div className="space-y-3">
@@ -251,7 +251,7 @@ export function AddToolModal({ isOpen, onClose, onSuccess, tools }: AddToolModal
                 />
                 
                 {imagePreview ? (
-                  <div className="relative w-full max-w-2xl h-[300px] mb-4 mx-auto">
+                  <div className="relative w-full max-w-2xl h-[200px] sm:h-[300px] mb-4 mx-auto">
                     <img
                       src={imagePreview}
                       alt="Tool preview"
@@ -260,28 +260,28 @@ export function AddToolModal({ isOpen, onClose, onSuccess, tools }: AddToolModal
                     <button
                       type="button"
                       onClick={handleRemoveImage}
-                      className="absolute top-3 right-3 p-2 rounded-full bg-background/90 hover:bg-background border border-border shadow-sm transition-colors"
+                      className="absolute top-2 right-2 sm:top-3 sm:right-3 p-2 rounded-full bg-background/90 hover:bg-background border border-border shadow-sm transition-colors touch-manipulation"
                     >
-                      <X className="h-5 w-5" />
+                      <X className="h-4 w-4 sm:h-5 sm:w-5" />
                     </button>
                   </div>
                 ) : (
                   <Button
                     type="button"
                     variant="outline"
-                    className="w-full max-w-2xl h-[300px] mx-auto flex flex-col items-center justify-center gap-4 
-                             border-2 border-dashed rounded-lg hover:bg-muted/30 transition-colors"
+                    className="w-full max-w-2xl h-[200px] sm:h-[300px] mx-auto flex flex-col items-center justify-center gap-3 sm:gap-4 
+                             border-2 border-dashed rounded-lg hover:bg-muted/30 transition-colors touch-manipulation"
                     onClick={() => fileInputRef.current?.click()}
                     disabled={isSubmitting}
                   >
-                    <div className="p-4 rounded-full bg-muted/50">
-                      <ImagePlus className="h-10 w-10 text-muted-foreground" />
+                    <div className="p-3 sm:p-4 rounded-full bg-muted/50">
+                      <ImagePlus className="h-8 w-8 sm:h-10 sm:w-10 text-muted-foreground" />
                     </div>
-                    <div className="space-y-2 text-center">
-                      <p className="text-base font-medium text-foreground">
+                    <div className="space-y-1 sm:space-y-2 text-center">
+                      <p className="text-sm sm:text-base font-medium text-foreground">
                         Click to upload image
                       </p>
-                      <p className="text-sm text-muted-foreground">
+                      <p className="text-xs sm:text-sm text-muted-foreground">
                         SVG, PNG, JPG (max. 5MB)
                       </p>
                     </div>
